@@ -117,7 +117,7 @@ Fixed window cho phép 10 request lúc 10:00:59 và thêm 10 lúc 10:01:00 khi b
 Hai cơ chế này khác nhau ở điểm nào? Cho một tình huống mà rate limit cho qua
 nhưng cost guard phải chặn, và một tình huống ngược lại.
 
-Rate limit giới hạn tần suất, cost guard giới hạn tiền theo tháng. User gọi chậm nhưng đã tiêu 11 USD với budget 10 USD thì rate limit cho qua nhưng cost guard trả 402. User chưa hết budget nhưng gửi request thứ 11 trong 60 giây thì limiter trả 429. Kiểm thử HTTP thật đã kiểm tra cả hai. Cost guard lab không giữ trước ngân sách cho các request đồng thời.
+Rate limit giới hạn tần suất, cost guard giới hạn tiền theo tháng. User gọi chậm nhưng đã tiêu 11 USD với budget 10 USD thì rate limit cho qua nhưng cost guard trả 402. User chưa hết budget nhưng gửi request thứ 11 trong 60 giây thì limiter trả 429. Kiểm thử cloud thực tế xác nhận rate limit trả 429; `test_cp3.py` xác nhận cost guard trả 402 khi vượt ngân sách. Cost guard của lab không giữ trước ngân sách cho các request đồng thời.
 
 ---
 
@@ -154,11 +154,18 @@ Ghi lại **một** lỗi bạn gặp khi deploy lên cloud (build fail, health 
 timeout, sai REDIS_URL, app không đọc `$PORT`...): thông báo lỗi là gì, bạn
 tìm ra nguyên nhân bằng cách nào, và sửa ra sao?
 
-Khi deploy service lên cloud platform (như Railway), tôi gặp lỗi Health Check Timeout khiến service liên tục restart/crash loop và deployment bị fail:
-- **Thông báo lỗi:** Platform log thông báo: `Healthcheck failed: Connection refused` hoặc `Service failed to respond on port 8000 within timeout (30s)`.
-- **Nguyên nhân:** Ban đầu Dockerfile và Uvicorn được cấu hình cố định lắng nghe cổng 8000 (`--port 8000`), trong khi các nền tảng PaaS như Railway tự động gán một cổng ngẫu nhiên cho container thông qua biến môi trường `$PORT` và định tuyến traffic từ bên ngoài qua cổng đó. Khi container chỉ lắng nghe trên 8000 mà không đọc `$PORT`, reverse proxy của platform không thể kết nối tới container, khiến health check thất bại. Ngoài ra, Uvicorn nếu bind `127.0.0.1` thay vì `0.0.0.0` cũng khiến reverse proxy không thể truy cập từ ngoài container.
-- **Cách tìm ra:** Mở tab Deploy Logs và Service Logs trên dashboard của Railway, phát hiện Railway gán biến `PORT` ngẫu nhiên (ví dụ 7381) nhưng log uvicorn lại hiển thị `Uvicorn running on http://127.0.0.1:8000`.
-- **Cách sửa:**
-  1. Cập nhật `CMD` trong Dockerfile sang dạng đọc biến môi trường `$PORT` với fallback: `exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --timeout-graceful-shutdown 30 --no-server-header`.
-  2. Cập nhật lệnh `HEALTHCHECK` trong Dockerfile để đọc đúng `os.getenv('PORT', '8000')`.
-  3. Cập nhật `railway.toml` định nghĩa `healthcheckPath = "/health"` và không hardcode cổng. Sau khi sửa và deploy lại, service vượt qua health check ngay ở lần thử đầu tiên và chuyển sang trạng thái Active/Success.
+Khi mở Public URL `/health`, tôi gặp lỗi `502 Application failed to respond`.
+
+Tôi mở Deploy Logs và thấy ứng dụng đã khởi động thành công, không có traceback:
+`Application startup complete` và
+`Uvicorn running on http://0.0.0.0:8080`.
+
+Sau đó tôi kiểm tra `Settings → Networking` và thấy domain công khai đang có
+Target Port là `8000`. Railway Edge Proxy gửi request tới cổng 8000 trong khi
+Uvicorn thực tế lắng nghe ở cổng 8080, nên proxy không kết nối được và trả 502.
+
+Tôi sửa Target Port của public domain từ `8000` thành `8080`. Sau khi lưu thay
+đổi, `/health` trả HTTP 200 với `status: ok`, còn `/ready` trả HTTP 200 với
+`redis: true`. Lỗi này giúp tôi phân biệt deployment thành công với public
+routing hoạt động đúng: container có thể đang chạy nhưng domain vẫn lỗi nếu
+Target Port không khớp.
