@@ -3,6 +3,34 @@
 Đưa một AI agent từ `localhost:8000` lên một địa chỉ công khai mà người khác
 gọi được, có bảo mật, có giới hạn chi phí, và không sập khi bạn deploy bản mới.
 
+## Kết Quả Bài Làm
+
+| Mục | Kết quả |
+|---|---|
+| Họ và tên | Từ Hoàng Giang |
+| Mã học viên | L3A202602363 |
+| Repository | [K4-L3A-DAY12-TuHoangGiang-L3A202602363-CloudServicesAndDeployment](https://github.com/gianghoang0810/K4-L3A-DAY12-TuHoangGiang-L3A202602363-CloudServicesAndDeployment) |
+| Nền tảng deploy | Railway |
+| Public API | [Mở Swagger UI](https://k4-l3a-day12-tuhoanggiang-l3a202602363-cloudserv-production.up.railway.app/docs) |
+| Liveness | [`/health`](https://k4-l3a-day12-tuhoanggiang-l3a202602363-cloudserv-production.up.railway.app/health) — HTTP 200 |
+| Readiness | [`/ready`](https://k4-l3a-day12-tuhoanggiang-l3a202602363-cloudserv-production.up.railway.app/ready) — HTTP 200, Redis sẵn sàng |
+| Điểm tự động | 100/100 phần bắt buộc (`grade.py --no-bonus`) |
+
+Kết quả kiểm tra cuối:
+
+| Phần | Kết quả | Điểm |
+|---|---:|---:|
+| CP1 — Config, Health & Logging | 13/13 test | 15/15 |
+| CP2 — Docker | 16/16 test | 15/15 |
+| CP3 — API Security | 22/22 test | 20/20 |
+| CP4 — Scaling & Reliability | 19/19 test | 20/20 |
+| CP5 — Railway Deployment | 9/9 test, 4 local fallback skipped | 15/15 |
+| Exercises | 10/10 câu | 15/15 |
+
+Bằng chứng deploy: [Railway dashboard](screenshots/dashboard.png) và
+[kết quả `/health`](screenshots/health.png). Chi tiết các request kiểm tra nằm
+trong [DEPLOYMENT.md](DEPLOYMENT.md).
+
 ---
 
 ## ⚠️ Bài Làm Cá Nhân
@@ -276,13 +304,13 @@ Nộp **link repository** lên Codelab. Repo phải ở chế độ public.
 
 ## Danh Sách Kiểm Tra Trước Khi Nộp
 
-- [ ] Repo đúng tên `K4-L3A-DAY12-<HoVaTen>-<MSSV>-CloudServicesAndDeployment`
-- [ ] `pytest tests/ -v` — đã chạy và biết rõ test nào còn rớt, vì sao
-- [ ] `python grade.py` — xem điểm, mục tiêu ≥ 75/100
-- [ ] `exercises.md` — đủ 10 câu, viết bằng lời của mình
-- [ ] `DEPLOYMENT.md` — có Public URL thật, không dán giá trị API key
-- [ ] `screenshots/` — có ảnh dashboard và ảnh gọi `/health`
-- [ ] `.env` **không** nằm trong repo (`git ls-files | grep .env` chỉ ra `.env.example`)
-- [ ] Không còn `NotImplementedError` nào trong `app/`
-- [ ] Có commit ở nhiều mốc thời gian, không phải một commit duy nhất
+- [x] Repo đúng tên `K4-L3A-DAY12-<HoVaTen>-<MSSV>-CloudServicesAndDeployment`
+- [x] `pytest tests/ -v` — đã chạy và biết rõ test nào còn rớt, vì sao
+- [x] `python grade.py` — đạt 100/100 phần bắt buộc
+- [x] `exercises.md` — đủ 10 câu, dựa trên kết quả đã kiểm chứng
+- [x] `DEPLOYMENT.md` — có Public URL thật, không chứa giá trị API key
+- [x] `screenshots/` — có ảnh dashboard và ảnh gọi `/health`
+- [x] `.env` **không** nằm trong repo (`git ls-files .env` không có kết quả)
+- [x] Không còn `NotImplementedError` nào trong `app/`
+- [x] Có nhiều commit thể hiện quá trình hoàn thiện bài lab
 - [ ] *(Bonus)* `.github/workflows/ci.yml` chạy xanh, README có badge `passing`
