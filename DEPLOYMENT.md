@@ -12,13 +12,13 @@
 |-----|----------|
 | Họ và tên | Từ Hoàng Giang |
 | Mã học viên | L3A202602363 |
-| Repo | https://github.com/gianghoang0810/K4-L3A-DAY12-TuHoangGiang-L3A202602363-Cloud-Service-And-Deployment |
+| Repo | https://github.com/gianghoang0810/K4-L3A-DAY12-TuHoangGiang-L3A202602363-CloudServicesAndDeployment |
 
 ## Service
 
 | Mục | Nội dung |
 |-----|----------|
-| Public URL | https://TODO-thay-bang-url-that.up.railway.app |
+| Public URL | https://k4-l3a-day12-tuhoanggiang-l3a202602363-cloudserv-production.up.railway.app |
 | Platform | Railway |
 | Ngày deploy | 2026-09-28 |
 
